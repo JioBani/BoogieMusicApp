@@ -1,0 +1,68 @@
+{
+  "songs" : {
+    "search": "search",
+    "target" : "songs",
+    "result": [
+      {
+        "music_id" : 1,
+        "music_title" : "Life is Beautiful 01",
+        "album_id" : 3,
+        "streaming_count" : 10,
+        "lyrics" : "",
+        "image_url" : "https://ibighit.com/bts/images/bts/discography/butter/butter-cover.jpg"
+      },
+      {
+        "music_id" : 2,
+        "music_title" : "Life is Beautiful 02",
+        "album_id" : 3,
+        "streaming_count" : 10,
+        "lyrics" : "",
+        "image_url" : "https://ibighit.com/bts/images/bts/discography/butter/butter-cover.jpg"
+      }
+    ]
+  },  
+  "artist" : {
+    "search": "search",
+    "target" : "artist",
+    "result": [
+      {
+        "music_id" : 1,
+        "music_title" : "Life is Beautiful 01",
+        "album_id" : 3,
+        "streaming_count" : 10,
+        "lyrics" : "",
+        "image_url" : "https://ibighit.com/bts/images/bts/discography/butter/butter-cover.jpg"
+      }
+    ]
+  },
+  "albums" : {
+    "search": "search",
+    "target" : "albums",
+    "result": [
+      {
+        "music_id" : 1,
+        "music_title" : "Life is Beautiful 01",
+        "album_id" : 3,
+        "streaming_count" : 10,
+        "lyrics" : "",
+        "image_url" : "https://ibighit.com/bts/images/bts/discography/butter/butter-cover.jpg"
+      },
+      {
+        "music_id" : 1,
+        "music_title" : "Life is Beautiful 02",
+        "album_id" : 2,
+        "streaming_count" : 10,
+        "lyrics" : "",
+        "image_url" : "https://ibighit.com/bts/images/bts/discography/butter/butter-cover.jpg"
+      },
+      {
+        "music_id" : 1,
+        "music_title" : "Life is Beautiful 03",
+        "album_id" : 3,
+        "streaming_count" : 10,
+        "lyrics" : "",
+        "image_url" : "https://ibighit.com/bts/images/bts/discography/butter/butter-cover.jpg"
+      }
+    ]
+  }
+}

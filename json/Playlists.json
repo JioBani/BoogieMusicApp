@@ -1,0 +1,67 @@
+{
+  "playlist" : [
+    {
+    "playlist_id": 1,
+      "user_id": "user01",
+      "playlist_name": "발라드",
+      "music": [
+        {
+          "music_id" : 1,
+          "music_title" : "Life is Beautiful 01",
+          "album_id" : 3,
+          "streamming_count" : 10,
+          "lyics" : ""
+        }
+      ]
+    },  
+    {
+    "playlist_id":2,
+      "user_id": "user01",
+      "playlist_name": "발라드",
+      "music": [
+        {
+          "music_id" : 1,
+          "music_title" : "Life is Beautiful 01",
+          "album_id" : 3,
+          "streamming_count" : 10,
+          "lyics" : ""
+        },
+        {
+          "music_id" : 2,
+          "music_title" : "Life is Beautiful 02",
+          "album_id" : 3,
+          "streamming_count" : 10,
+          "lyics" : ""
+        }
+      ]
+    },
+    {
+    "playlist_id": 1,
+      "user_id": "user01",
+      "playlist_name": "발라드",
+      "music": [
+        {
+          "music_id" : 1,
+          "music_title" : "Life is Beautiful 01",
+          "album_id" : 3,
+          "streamming_count" : 10,
+          "lyics" : ""
+        },
+        {
+          "music_id" : 2,
+          "music_title" : "Life is Beautiful 02",
+          "album_id" : 3,
+          "streamming_count" : 10,
+          "lyics" : ""
+        },
+        {
+          "music_id" : 3,
+          "music_title" : "Life is Beautiful 03",
+          "album_id" : 3,
+          "streamming_count" : 10,
+          "lyics" : ""
+        }
+      ]
+    }
+  ]
+}
