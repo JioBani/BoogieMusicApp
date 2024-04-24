@@ -1,20 +1,20 @@
-import 'package:database_project/Common/MusicApiResponse.dart';
+import 'package:database_project/Service/ApiService/ApiResponse.dart';
 import 'package:database_project/Common/StaticLogger.dart';
 import 'package:database_project/Model/AlbumExtend.dart';
 import 'package:database_project/Model/ArtistExtend.dart';
 import 'package:database_project/Model/CurrentPlaylist/CreateCurrentPlaylistDto.dart';
-import 'package:database_project/Model/CurrentPlaylist/CurrentPlaylist.dart';
-import 'package:database_project/Model/Music.dart';
-import 'package:database_project/Model/MusicExtend.dart';
+import 'package:database_project/Model/CurrentPlaylist/CurrentPlaylistDto.dart';
 import 'package:database_project/Model/Playlist/CreatePlaylistDto.dart';
 import 'package:database_project/Model/Playlist/CreatePlaylistSongDto.dart';
 import 'package:database_project/Model/Playlist/PlaylistExtend.dart';
 import 'package:database_project/Model/SearchResult.dart';
-import 'package:database_project/Model/TopChart.dart';
+import 'package:database_project/Model/TopChart/TopChartDto.dart';
+import 'package:database_project/Service/ApiService/ApiService.dart';
+import 'package:database_project/Service/ApiService/Exception.dart';
+import 'package:database_project/Service/LoginService.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:logger/logger.dart';
 
 import '../Model/Playlist/Playlist.dart';
 
@@ -27,9 +27,15 @@ class MusicService{
   //#. 플레이리스트
 
   //#. 플레이리스트 목록 가져오기
-  static Future<MusicApiResponse<List<Playlist>>> getPlaylistsByUserId(String userId) {
-    return MusicApiResponse.handleRequest(
-        request: http.get(Uri.parse(getLink("playlists/user/$userId"))).timeout(const Duration(seconds: 1)),
+  static Future<ApiResponse<List<Playlist>>> getPlaylistsByUserId() async {
+    return LoginService.tokenPipeline(
+        request:() => http.get(Uri.parse(
+            getLink("playlists/user")),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : "Bearer ${LoginService.accessToken!}"
+          },
+        ),
         action: (response){
           final List<dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           return jsonData.map((e) => Playlist.fromMap(e)).toList();
@@ -38,66 +44,105 @@ class MusicService{
   }
 
   //#. 플레이리스트 세부 항목 가져오기
-  static Future<MusicApiResponse<PlaylistExtend>> getPlaylistExtend(int playlistId) async {
-    return MusicApiResponse.handleRequest(
-        request: http.get(Uri.parse(getLink("playlists/id/extend/$playlistId"))).timeout(const Duration(seconds: 1)),
-        action: (response){
-          return PlaylistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
-        }
+  static Future<ApiResponse<PlaylistExtend>> getPlaylistExtend(int playlistId) async {
+    return LoginService.tokenPipeline(
+        request:() =>  http.get(Uri.parse(
+            getLink("playlists/extend/$playlistId")),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : "Bearer ${LoginService.accessToken!}"
+          },
+        ),
+        action: (response)=> PlaylistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)))
+    );
+  }
+
+  //#. 유저 id로 플레이리스트 세부 항목 가져오기
+  static Future<ApiResponse<List<PlaylistExtend>>> getPlaylistExtendsByUser() async {
+    return LoginService.tokenPipeline(
+        request:() =>  http.get(Uri.parse(
+            getLink("playlists/extend")),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : "Bearer ${LoginService.accessToken!}"
+          },
+        ),
+        action: (response) => (jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>).map((e) =>
+            PlaylistExtend.fromMap(e)
+        ).toList()
     );
   }
 
   //#. 플레이리스트 만들기
-  static Future<MusicApiResponse<dynamic>> createPlaylist(CreatePlaylistDto createPlaylistDto) async {
-    StaticLogger.logger.i(jsonEncode(createPlaylistDto.toMap()));
-    return MusicApiResponse.handleRequest(
-        request: http.post(
-          Uri.parse(getLink("playlists")),
-          headers: {"Content-Type": "application/json"},
-          body: createPlaylistDto.toJson()
-        ).timeout(const Duration(seconds: 1)),
-        action: (response){
-          return response.body;
-        }
+  static Future<ApiResponse<Playlist>> createPlaylist(CreatePlaylistDto createPlaylistDto) async {
+    return LoginService.tokenPipeline(
+        request:() =>  http.post(
+            Uri.parse(getLink("playlists")),
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization" : "Bearer ${LoginService.accessToken}"
+            },
+            body: createPlaylistDto.toJson()
+        ),
+        action: (response) => Playlist.fromMap(jsonDecode(response.body))
     );
   }
 
   //#. 플레이리스트 변경
-  static Future<MusicApiResponse<dynamic>> updatePlaylist(int playlistId , CreatePlaylistDto createPlaylistDto) async {
-    return MusicApiResponse.handleRequest(
-        request: http.patch(
-            Uri.parse(getLink("playlists/$playlistId")),
-            headers: {"Content-Type": "application/json"},
-            body: createPlaylistDto.toJson()
-        ).timeout(const Duration(seconds: 1)),
-        action: (response){
-          return response.body;
-        }
+  static Future<ApiResponse<dynamic>> updatePlaylist(int playlistId , CreatePlaylistDto createPlaylistDto) async {
+    return LoginService.tokenPipeline(
+        request: () =>
+            http.patch(
+                Uri.parse(getLink("playlists/$playlistId")),
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer ${LoginService.accessToken!}"
+                },
+                body: createPlaylistDto.toJson()
+            ),
+        action: (response) => response.body
     );
   }
 
   //#. 플레이리스트 삭제
-  static Future<MusicApiResponse<dynamic>> deletePlaylist(int playlistId) async {
-    return MusicApiResponse.handleRequest(
-        request: http.delete(
-            Uri.parse(getLink("playlists/$playlistId")),
-        ).timeout(const Duration(seconds: 1)),
-        action: (response){
-          return response.body;
-        }
+  static Future<ApiResponse<dynamic>> deletePlaylist(int playlistId) async {
+    return LoginService.tokenPipeline(
+        request: () => http.delete(
+          Uri.parse(getLink("playlists/$playlistId")),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : "Bearer ${LoginService.accessToken!}"
+          },
+        ),
+        action: (response) => response.body
     );
   }
 
-  static Future<MusicApiResponse<dynamic>> addMusicAtPlaylist(int playlistId, int musicId) async {
-    return MusicApiResponse.handleRequest(
-        request: http.post(
-          Uri.parse(getLink("playlist-songs")),
-            headers: {"Content-Type": "application/json"},
+  static Future<ApiResponse<dynamic>> addMusicAtPlaylist(int playlistId, int musicId) async {
+    return LoginService.tokenPipeline(
+        request: () => http.post(
+            Uri.parse(getLink("playlist-songs")),
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization" : "Bearer ${LoginService.accessToken!}"
+            },
             body: CreatePlaylistSongDto(playlistId: playlistId, musicId: musicId).toJson()
-        ).timeout(const Duration(seconds: 1)),
-        action: (response){
-          return response.body;
-        }
+        ),
+        action: (response) => response.body
+    );
+  }
+
+  static Future<ApiResponse<dynamic>> deleteMusicAtPlaylist(int playlistId, int musicId) async {
+    return LoginService.tokenPipeline(
+        request: () => http.delete(
+            Uri.parse(getLink("playlist-songs")),
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization" : "Bearer ${LoginService.accessToken!}"
+            },
+            body: CreatePlaylistSongDto(playlistId: playlistId, musicId: musicId).toJson()
+        ),
+        action: (response) => response.body
     );
   }
 
@@ -105,25 +150,24 @@ class MusicService{
   //#. 인기차트
 
   //#. 인기차트 가져오기
-  static Future<MusicApiResponse<List<MusicExtend>>> getTopChart() async {
-    return MusicApiResponse.handleRequest(
+  static Future<ApiResponse<TopChartDto>> getTopChart() async {
+    return ApiResponse.handleRequest(
         request: http.get(
-          Uri.parse(getLink("top-charts")),
-        ).timeout(const Duration(seconds: 1)),
+          Uri.parse(getLink("top-charts/dto")),
+        ),
         action: (response){
-          final List<dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
-          return jsonData.map((e) => MusicExtend.fromMap(e)).toList();
+          return TopChartDto.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
         }
     );
   }
 
 
   //#. 검섹
-  static Future<MusicApiResponse<SearchResult>> search(String text) async {
-    return MusicApiResponse.handleRequest(
+  static Future<ApiResponse<SearchResult>> search(String text) async {
+    return ApiResponse.handleRequest(
         request: http.get(
           Uri.parse(getLink("search/$text")),
-        ).timeout(const Duration(seconds: 1)),
+        ),
         action: (response){
           return SearchResult.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
         }
@@ -131,46 +175,54 @@ class MusicService{
   }
 
   //#. 현재 플레이리스트 가져오기
-  static Future<MusicApiResponse<CurrentPlaylist>> getCurrentPlaylistByUserId(String userId) async{
-    return MusicApiResponse.handleRequest(
-        request: http.get(
-          Uri.parse(getLink("now-plays/extend/$userId")),
-        ).timeout(const Duration(seconds: 10)),
-        action: (response){
-          return CurrentPlaylist.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
-        }
+  static Future<ApiResponse<CurrentPlaylistDto>> getCurrentPlaylistByUserId() async{
+    return LoginService.tokenPipeline(
+        request: () => http.get(
+          Uri.parse(getLink("now-plays/dto")),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : "Bearer ${LoginService.accessToken}"
+          },
+        ),
+        action: (response) => CurrentPlaylistDto.fromMap(jsonDecode(utf8.decode(response.bodyBytes)))
     );
   }
 
   //#. 현재 플레이리스트에 음악 추가
-  static Future<MusicApiResponse<dynamic>> addMusicAtCurrentPlaylist(String userId , int musicId) async{
-    StaticLogger.logger.i(CreateCurrentPlaylistDto(userId: userId,musicId: musicId,playTime: DateTime.now().millisecondsSinceEpoch).toCreateJson());
-    return MusicApiResponse.handleRequest(
-        request: http.post(
+  static Future<ApiResponse<dynamic>> addMusicAtCurrentPlaylist(int musicId) async{
+    return LoginService.tokenPipeline(
+        request: () => http.post(
           Uri.parse(getLink("now-plays")),
-          headers: {"Content-Type": "application/json"},
-          body: CreateCurrentPlaylistDto(userId: userId,musicId: musicId,playTime: DateTime.now().millisecondsSinceEpoch).toCreateJson(),
-        ).timeout(const Duration(seconds: 1)),
-        action: (response){
-          return response.body;
-        }
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : "Bearer ${LoginService.accessToken}"
+          },
+          body: CreateCurrentPlaylistDto(
+              userId: LoginService.userId ?? '',
+              musicId: musicId,
+              playTime: DateTime.now().millisecondsSinceEpoch
+          ).toCreateJson(),
+        ),
+        action: (response) => response.body
     );
   }
 
-  static Future<MusicApiResponse<dynamic>> deleteMusicFromCurrentPlaylist(String userId , int musicId) async{
-    return MusicApiResponse.handleRequest(
-        request: http.delete(
-          Uri.parse(getLink("now-plays?user_id=$userId&music_id=$musicId")),
-        ).timeout(const Duration(seconds: 1)),
-        action: (response){
-          return response.body;
-        }
+  static Future<ApiResponse<dynamic>> deleteMusicFromCurrentPlaylist(int musicId) async{
+    return LoginService.tokenPipeline(
+        request: () => http.delete(
+          Uri.parse(getLink("now-plays/$musicId")),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : "Bearer ${LoginService.accessToken!}"
+          },
+        ),
+        action: (response) => response.body
     );
   }
 
   //#. 앨범
-  static Future<MusicApiResponse<AlbumExtent>> getAlbumExtend(int albumId) async{
-    return MusicApiResponse.handleRequest(
+  static Future<ApiResponse<AlbumExtent>> getAlbumExtend(int albumId) async{
+    return ApiResponse.handleRequest(
         request: http.get(
           Uri.parse(getLink("albums/extend/$albumId")),
         ).timeout(const Duration(seconds: 1)),
@@ -181,8 +233,8 @@ class MusicService{
   }
 
   //#. 아티스트
-  static Future<MusicApiResponse<ArtistExtend>> getArtistExtend(int artistId) async{
-    return MusicApiResponse.handleRequest(
+  static Future<ApiResponse<ArtistExtend>> getArtistExtend(int artistId) async{
+    return ApiResponse.handleRequest(
         request: http.get(
           Uri.parse(getLink("artists/extend/$artistId")),
         ).timeout(const Duration(seconds: 1)),
@@ -190,5 +242,50 @@ class MusicService{
           return ArtistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
         }
     );
+  }
+
+  //#. 리프레시 토큰 테스트 현재재생목록
+  static Future<ApiResponse<ArtistExtend>> testNowPlaylist() async{
+
+    ApiResponse<ArtistExtend> request = await ApiResponse.handleRequest(
+        request: http.get(
+          Uri.parse(getLink("now-plays/dto")),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : "Bearer ${LoginService.accessToken ?? ''}"
+          },
+        ).timeout(const Duration(seconds: 1)),
+        action: (response){
+          return ArtistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
+        }
+    );
+
+    if(request.isSuccess){
+      return request;
+    }
+    else{
+      StaticLogger.logger.e("[MusicService.testNowPlaylist()] 가져오기 실패");
+      if(request.exception.runtimeType != TokenExpireException){
+        return request;
+      }
+      else{
+        StaticLogger.logger.i("[MusicService.testNowPlaylist()] 엑세스 토큰 새로고침 시작");
+        ApiResponse refreshResponse = await LoginService.refreshAccessToken();
+        if(refreshResponse.isSuccess){
+          return ApiResponse.handleRequest(
+             request: http.get(
+               Uri.parse(getLink("now-plays/dto")),
+             ).timeout(const Duration(seconds: 1)),
+             action: (response){
+               return ArtistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
+             }
+          );
+        }
+        else{
+          StaticLogger.logger.e("[MusicService.testNowPlaylist()] 엑세스 토큰 새로고침 실패");
+         return ApiResponse<ArtistExtend>.fromException(refreshResponse.exception!);
+        }
+      }
+    }
   }
 }

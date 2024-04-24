@@ -23,7 +23,6 @@ class AlbumElementWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(PlaylistLibraryController());
     return InkWell(
       onTap: (){
         Get.to(AlbumPage(album: album,));

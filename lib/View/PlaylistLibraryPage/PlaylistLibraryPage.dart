@@ -2,6 +2,8 @@ import 'package:database_project/Common/ImageUrls.dart';
 import 'package:database_project/Controller/PlayerController.dart';
 import 'package:database_project/Controller/PlaylistLibraryController.dart';
 import 'package:database_project/Model/Playlist/Playlist.dart';
+import 'package:database_project/Model/Playlist/PlaylistExtend.dart';
+import 'package:database_project/Service/PlaylistService.dart';
 import 'package:database_project/View/BottomNavBar/BottomNavBar.dart';
 import 'package:database_project/View/Player/PlayerView.dart';
 import 'package:database_project/View/PlaylistLibraryPage/PlayListAddWidget.dart';
@@ -21,18 +23,11 @@ class _PlayListLibraryPageState extends State<PlayListLibraryPage> {
   int _currentIndex = 0;
 
   final _pageViewController = PageController(initialPage: 0, viewportFraction: 0.75);
-  PlaylistLibraryController controller = Get.put(PlaylistLibraryController());
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    controller.fetchData();
-  }
+  //PlaylistLibraryController controller = Get.put(PlaylistLibraryController());
 
   @override
   Widget build(BuildContext context) {
-    Get.put(PlaylistLibraryController());
+   // Get.put(PlaylistLibraryController());
 
     return Scaffold(
       body: SafeArea(
@@ -55,9 +50,9 @@ class _PlayListLibraryPageState extends State<PlayListLibraryPage> {
                   ),
                 ),
                 SizedBox(height: 20.h,),
-                GetX<PlaylistLibraryController>(
-                  builder: (controller) {
-                    if(controller.playlistList.isEmpty){
+                GetX<PlaylistService>(
+                  builder: (service) {
+                    if(service.playlistMap.isEmpty){
                       return Expanded(
                         child: PageView.builder(
                             controller: _pageViewController,
@@ -79,7 +74,7 @@ class _PlayListLibraryPageState extends State<PlayListLibraryPage> {
                       );
                     }
                     else{
-                      final List<Playlist> playlistList = controller.playlistList;
+                      final List<PlaylistExtend> playlistList = service.playlistMap.values.toList();
                       return Expanded(
                         child: PageView.builder(
                             controller: _pageViewController,
@@ -104,7 +99,7 @@ class _PlayListLibraryPageState extends State<PlayListLibraryPage> {
                                   pageController: _pageViewController,
                                   currentIndex: _currentIndex,
                                   index: index,
-                                  playlist: playlistList[index],
+                                  playlistExtend: playlistList[index],
                                   imageUrl: ImageUrls.playlistCoverList[index],
                                 );
                               }

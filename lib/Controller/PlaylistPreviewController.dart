@@ -1,4 +1,4 @@
-import 'package:database_project/Common/MusicApiResponse.dart';
+import 'package:database_project/Service/ApiService/ApiResponse.dart';
 import 'package:database_project/Model/Playlist/Playlist.dart';
 import 'package:database_project/Model/Playlist/PlaylistExtend.dart';
 import 'package:database_project/Service/MusicService.dart';
@@ -12,7 +12,7 @@ class PlaylistPreviewController extends GetxController{
   PlaylistPreviewController({required this.playlist});
 
   Future<void> fetchData() async {
-    MusicApiResponse<PlaylistExtend> musicApiResponse = await MusicService.getPlaylistExtend(playlist.id);
+    ApiResponse<PlaylistExtend> musicApiResponse = await MusicService.getPlaylistExtend(playlist.id);
     if(musicApiResponse.isSuccess){
       playlistExtend.value = musicApiResponse.response!;
     }

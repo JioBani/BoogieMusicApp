@@ -2,6 +2,7 @@
 import 'package:database_project/Controller/PlaylistLibraryController.dart';
 import 'package:database_project/Model/Music.dart';
 import 'package:database_project/Model/MusicExtend.dart';
+import 'package:database_project/Service/PlaylistService.dart';
 import 'package:database_project/View/MusicPlayPage/MusicPlayPage.dart';
 import 'package:database_project/View/PlaylistLibraryPage/PlaylistAddingPage/AddingMusicDialog.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,6 @@ class RankingElementWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(PlaylistLibraryController());
     return InkWell(
       onTap: (){
         Get.to(MusicPlayPage(music: music,));
@@ -119,8 +119,8 @@ class RankingElementWidget extends StatelessWidget {
                       context: context,
                       builder: (context){
                         return AddingMusicDialog(
-                            addMusic: music.music,
-                            playlistList: Get.find<PlaylistLibraryController>().playlistList
+                            addMusicExtend: music,
+                            playlistList: Get.find<PlaylistService>().playlistMap.values.toList()
                         );
                       }
                   );

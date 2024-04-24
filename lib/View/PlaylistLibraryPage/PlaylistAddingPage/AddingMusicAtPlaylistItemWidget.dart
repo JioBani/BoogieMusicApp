@@ -1,17 +1,24 @@
-import 'package:database_project/Controller/PlaylistLibraryController.dart';
+import 'package:database_project/Model/MusicExtend.dart';
 import 'package:database_project/Model/Playlist/Playlist.dart';
+import 'package:database_project/Service/PlaylistService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
-import '../../../Model/Music.dart';
 
 class AddingMusicAtPlaylistItemWidget extends StatefulWidget {
-  const AddingMusicAtPlaylistItemWidget({super.key, required this.playlist, required this.music, required this.dialogContext, required this.imageUrl});
+  const AddingMusicAtPlaylistItemWidget({
+    super.key,
+    required this.playlist,
+    required this.musicExtend,
+    required this.dialogContext,
+    required this.imageUrl
+  });
+
   final Playlist playlist;
-  final Music music;
+  final MusicExtend musicExtend;
   final BuildContext dialogContext;
   final String imageUrl;
 
@@ -25,7 +32,7 @@ class _AddingMusicAtPlaylistItemWidgetState extends State<AddingMusicAtPlaylistI
     return InkWell(
       onTap: () async {
         Navigator.pop(widget.dialogContext);
-        await Get.find<PlaylistLibraryController>().addMusicAtPlaylist(widget.playlist.id, widget.music.id, context);
+        await Get.find<PlaylistService>().addMusicAtPlaylist(widget.playlist.id, widget.musicExtend, context);
       },
       child: Container(
         width: double.infinity,

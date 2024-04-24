@@ -1,4 +1,4 @@
-import 'package:database_project/Common/MusicApiResponse.dart';
+import 'package:database_project/Service/ApiService/ApiResponse.dart';
 import 'package:database_project/Model/Playlist/Playlist.dart';
 import 'package:database_project/Model/Playlist/PlaylistExtend.dart';
 import 'package:database_project/Service/MusicService.dart';

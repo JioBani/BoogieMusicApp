@@ -1,8 +1,11 @@
-import 'package:database_project/Common/MusicApiResponse.dart';
+import 'package:database_project/Service/ApiService/ApiResponse.dart';
 import 'package:database_project/Common/StaticLogger.dart';
+import 'package:database_project/Model/Auth/JwtToken.dart';
 import 'package:database_project/Model/Playlist/CreatePlaylistDto.dart';
 import 'package:database_project/Model/Playlist/PlaylistExtend.dart';
 import 'package:database_project/Model/SearchResult.dart';
+import 'package:database_project/Service/ApiService/ApiService.dart';
+import 'package:database_project/Service/LoginService.dart';
 import 'package:database_project/Service/MusicService.dart';
 import 'package:database_project/View/AlbumPage/AlbumPage.dart';
 import 'package:database_project/View/CurrentPlayListPage/CurrentPlaylistPage.dart';
@@ -26,16 +29,16 @@ class TestPage extends StatelessWidget {
               children: [
                 TextButton(
                     onPressed: () async {
-                      MusicApiResponse<SearchResult> searchResult = await MusicService.search("d");
-                      if(searchResult.isSuccess){
-                        print(searchResult.response!.songsResult);
-                        //print(searchResult.albumsResult);
-                        //print(searchResult.artistsResult);
-
+                      ApiResponse<bool> response = await LoginService.login('admin2', 'admin2');
+                      if(response.isSuccess){
+                        StaticLogger.logger.i('로그인 완료');
+                      }
+                      else{
+                        StaticLogger.logger.e('로그인 실패 : ${response.exception!}');
                       }
                     },
                     child: Text(
-                      "검색",
+                      "로그인",
                       style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w700,
@@ -45,45 +48,21 @@ class TestPage extends StatelessWidget {
                 ),
                 TextButton(
                     onPressed: () async {
-                      //String result = await MusicService.addMusicAtPlaylist(4 , 1);
-                      //print(result);
-                    },
-                    child: Text(
-                      "플레이리스트에 음악 추가",
-                      style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
-                          color : Colors.black
-                      ),
-                    )
-                ),
-                TextButton(
-                    onPressed: () async {
-                      Get.to(CurrentPlaylistPage());
-                    },
-                    child: Text(
-                      "현재 플레이리스트",
-                      style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
-                          color : Colors.black
-                      ),
-                    )
-                ),
-                TextButton(
-                    onPressed: () async {
-                      MusicApiResponse<List<Playlist>> response = await MusicService.getPlaylistsByUserId('user01');
-                      if(response.isSuccess){
-                        for (var element in response.response!) {
-                          StaticLogger.logger.i(element.toMap());
+                      ApiResponse<bool>? response = await LoginService.auth();
+                      if(response == null){
+                        StaticLogger.logger.i('로그인 되어있지 않음');
+                      }
+                      else{
+                        if(response.isSuccess){
+                          StaticLogger.logger.i('로그인 완료');
+                        }
+                        else{
+                          StaticLogger.logger.e('로그인 실패 : ${response.exception!}');
                         }
                       }
-                      else{
-                        StaticLogger.logger.e(response.exception);
-                      }
                     },
                     child: Text(
-                      "플레이리스트 목록 가져오기",
+                      "로그인 체크",
                       style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w700,
@@ -93,16 +72,10 @@ class TestPage extends StatelessWidget {
                 ),
                 TextButton(
                     onPressed: () async {
-                      MusicApiResponse<PlaylistExtend> response = await MusicService.getPlaylistExtend(1);
-                      if(response.isSuccess){
-                        StaticLogger.logger.i(response.response!.toMap());
-                      }
-                      else{
-                        StaticLogger.logger.e(response.exception);
-                      }
+                      LoginService.logout();
                     },
                     child: Text(
-                      "플레이리스트 가져오기",
+                      "로그아웃",
                       style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w700,
@@ -112,79 +85,10 @@ class TestPage extends StatelessWidget {
                 ),
                 TextButton(
                     onPressed: () async {
-                      MusicApiResponse<dynamic> response = await MusicService.createPlaylist(
-                        CreatePlaylistDto(name: 'name', userId: 'user01')
-                      );
-                      if(response.isSuccess){
-                        for (var element in response.response!) {
-                          StaticLogger.logger.i(element.toMap());
-                        }
-                      }
-                      else{
-                        StaticLogger.logger.e(response.exception);
-                      }
-
+                      await LoginService.refreshAccessToken();
                     },
                     child: Text(
-                      "플레이리스트 만들기",
-                      style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
-                          color : Colors.black
-                      ),
-                    )
-                ),
-                TextButton(
-                    onPressed: () async {
-                      MusicApiResponse<dynamic> response = await MusicService.updatePlaylist(
-                        9,
-                        CreatePlaylistDto(name: 'name2', userId: 'user01')
-                      );
-                      if(response.isSuccess){
-                        StaticLogger.logger.i(response.response);
-                      }
-                      else{
-                        StaticLogger.logger.e(response.exception);
-                      }
-
-                    },
-                    child: Text(
-                      "플레이리스트 변경",
-                      style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
-                          color : Colors.black
-                      ),
-                    )
-                ),
-                TextButton(
-                    onPressed: () async {
-                      MusicApiResponse<dynamic> response = await MusicService.deletePlaylist(
-                          9,
-                      );
-                      if(response.isSuccess){
-                        StaticLogger.logger.i(response.response);
-                      }
-                      else{
-                        StaticLogger.logger.e(response.exception);
-                      }
-
-                    },
-                    child: Text(
-                      "플레이리스트 삭제",
-                      style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
-                          color : Colors.black
-                      ),
-                    )
-                ),
-                TextButton(
-                    onPressed: () async {
-                      //Get.to(AlbumPage());
-                    },
-                    child: Text(
-                      "앨범페이지",
+                      "Refresh",
                       style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w700,

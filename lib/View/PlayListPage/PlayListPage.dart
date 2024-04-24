@@ -1,5 +1,10 @@
 import 'package:database_project/Controller/PlaylistPageController.dart';
+import 'package:database_project/Model/Music.dart';
+import 'package:database_project/Model/MusicExtend.dart';
 import 'package:database_project/Model/Playlist/Playlist.dart';
+import 'package:database_project/Model/Playlist/PlaylistExtend.dart';
+import 'package:database_project/Service/LoadingState.dart';
+import 'package:database_project/Service/PlaylistService.dart';
 import 'package:database_project/View/BottomNavBar/BottomNavBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,25 +20,15 @@ const String newj = "https://marketplace.canva.com/EAExV_SCzfw/1/0/1600w/canva-%
 const String evan = "https://i1.sndcdn.com/artworks-000156787653-tqesbb-t500x500.jpg";
 
 class PlayListPage extends StatefulWidget {
-  const PlayListPage({super.key, required this.playlist});
+  const PlayListPage({super.key, required this.playlistExtend});
 
-  final Playlist playlist;
+  final PlaylistExtend playlistExtend;
 
   @override
   State<PlayListPage> createState() => _PlayListPageState();
 }
 
 class _PlayListPageState extends State<PlayListPage> {
-
-  @override
-  void initState() {
-    var controller = Get.put(
-        PlaylistPageController(playlistId: widget.playlist.id) ,
-        tag: widget.playlist.id.toString()
-    );
-    controller.fetchData();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +43,7 @@ class _PlayListPageState extends State<PlayListPage> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  widget.playlist.name,
+                  widget.playlistExtend.playlist.name,
                   style: TextStyle(
                     fontSize: 32.sp,
                     fontWeight: FontWeight.w700
@@ -65,23 +60,18 @@ class _PlayListPageState extends State<PlayListPage> {
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(30.r) , topRight: Radius.circular(30.r)),
                   //color: Color(0xffEBC7E4)
                 ),
-                child: GetX<PlaylistPageController>(
-                  tag: widget.playlist.id.toString(),
-                  builder: (controller) {
-                    if(controller.playlistExtend.value != null){
-                      return ListView.builder(
-                          itemCount:  controller.playlistExtend.value!.musics.length,
-                          itemBuilder: (context , index){
-                            return MusicElementWidget(
-                              musicExtend: controller.playlistExtend.value!.musics[index],
-                              isInPlaylist: widget.playlist.id,
-                            );
-                          }
-                      );
-                    }
-                    else{
-                      return const CupertinoActivityIndicator();
-                    }
+                child: GetX<PlaylistService>(
+                  builder: (service) {
+                    List<MusicExtend> musicExtends = service.playlistMap[widget.playlistExtend.playlist.id]!.musics;
+                    return ListView.builder(
+                        itemCount:  musicExtends.length,
+                        itemBuilder: (context , index){
+                          return MusicElementWidget(
+                            musicExtend: musicExtends[index],
+                            playlistId: widget.playlistExtend.playlist.id,
+                          );
+                        }
+                    );
                   }
                 ),
               ),

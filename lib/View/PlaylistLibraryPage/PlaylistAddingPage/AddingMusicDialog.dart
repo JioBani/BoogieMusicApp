@@ -1,15 +1,17 @@
 import 'package:database_project/Common/ImageUrls.dart';
 import 'package:database_project/Model/Music.dart';
+import 'package:database_project/Model/MusicExtend.dart';
 import 'package:database_project/Model/Playlist/Playlist.dart';
+import 'package:database_project/Model/Playlist/PlaylistExtend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'AddingMusicAtPlaylistItemWidget.dart';
 
 class AddingMusicDialog extends StatelessWidget {
-  const AddingMusicDialog({super.key, required this.addMusic, required this.playlistList});
-  final Music addMusic;
-  final List<Playlist> playlistList;
+  const AddingMusicDialog({super.key, required this.addMusicExtend, required this.playlistList});
+  final MusicExtend addMusicExtend;
+  final List<PlaylistExtend> playlistList;
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +34,8 @@ class AddingMusicDialog extends StatelessWidget {
           itemCount: playlistList.length,
           itemBuilder: (context , index){
             return AddingMusicAtPlaylistItemWidget(
-              playlist: playlistList[index],
-              music: addMusic,
+              playlist: playlistList[index].playlist,
+              musicExtend: addMusicExtend,
               dialogContext: context,
               imageUrl: ImageUrls.playlistCoverList[index],
             );

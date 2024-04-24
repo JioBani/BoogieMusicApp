@@ -1,4 +1,5 @@
-import 'package:database_project/Common/MusicApiResponse.dart';
+/*
+import 'package:database_project/Common/ApiResponse.dart';
 import 'package:database_project/Model/Playlist/CreatePlaylistDto.dart';
 import 'package:database_project/Model/Playlist/CreatePlaylistSongDto.dart';
 import 'package:database_project/Model/Playlist/Playlist.dart';
@@ -23,7 +24,7 @@ class PlaylistLibraryController extends GetxController {
     }
 
     Future<void> fetchData() async {
-      MusicApiResponse<List<Playlist>> response =  await MusicService.getPlaylistsByUserId("user01");
+      MusicApiResponse<List<Playlist>> response =  await MusicService.getPlaylistsByUserId();
       if(response.isSuccess){
         playlistList.value = response.response!;
       }
@@ -48,7 +49,7 @@ class PlaylistLibraryController extends GetxController {
 
     Future<String> addPlaylist(String playlistName)async{
       MusicApiResponse<dynamic> result = await MusicService.createPlaylist(
-        CreatePlaylistDto(name: playlistName, userId: 'user01')
+        CreatePlaylistDto(name: playlistName)
       );
 
       if(result.isSuccess){
@@ -87,4 +88,4 @@ class PlaylistLibraryController extends GetxController {
         return "추가 실패 : ${response.exception}";
       }
     }
-}
+}*/

@@ -1,6 +1,7 @@
 import 'package:database_project/Controller/PlaylistLibraryController.dart';
 import 'package:database_project/Model/MusicExtend.dart';
 import 'package:database_project/Service/CurrentPlaylistService.dart';
+import 'package:database_project/Service/PlaylistService.dart';
 import 'package:database_project/View/MusicPlayPage/MusicPlayPage.dart';
 import 'package:database_project/View/PlaylistLibraryPage/PlaylistAddingPage/AddingMusicDialog.dart';
 import 'package:flutter/material.dart';
@@ -14,15 +15,14 @@ enum MenuType{
 }
 
 class MusicElementWidget extends StatelessWidget {
-  const MusicElementWidget({super.key, required this.musicExtend, this.isInPlaylist, this.isInCurrentPlaylist = false});
+  const MusicElementWidget({super.key, required this.musicExtend, this.playlistId, this.isInCurrentPlaylist = false});
 
   final MusicExtend musicExtend;
-  final int? isInPlaylist;
+  final int? playlistId;
   final bool isInCurrentPlaylist;
 
   @override
   Widget build(BuildContext context) {
-    Get.put(PlaylistLibraryController());
     var currentPlaylistService = Get.find<CurrentPlaylistService>();
     return InkWell(
       onTap: (){
@@ -109,15 +109,15 @@ class MusicElementWidget extends StatelessWidget {
                       context: context,
                       builder: (context){
                         return AddingMusicDialog(
-                            addMusic: musicExtend.music,
-                            playlistList: Get.find<PlaylistLibraryController>().playlistList
+                            addMusicExtend: musicExtend,
+                            playlistList: Get.find<PlaylistService>().playlistMap.values.toList()
                         );
                       }
                   );
                 }                //Get.to(AddingMusicAtPlaylistPage(addMusic: music,));
               },
               itemBuilder: (BuildContext buildContext) {
-                if(isInPlaylist != null || isInCurrentPlaylist){
+                if(playlistId != null || isInCurrentPlaylist){
                   return [
                     PopupMenuItem(
                       value: MenuType.add,
@@ -135,6 +135,9 @@ class MusicElementWidget extends StatelessWidget {
                       onTap : (){
                         if(isInCurrentPlaylist){
                           currentPlaylistService.deleteMusic( musicExtend.music.id);
+                        }
+                        else if(playlistId != null){
+                          Get.find<PlaylistService>().deleteMusicAtPlaylist(playlistId!, musicExtend, context);
                         }
                       },
                       child: Text(

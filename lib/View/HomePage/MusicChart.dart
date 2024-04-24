@@ -1,5 +1,5 @@
 import 'package:database_project/Model/MusicExtend.dart';
-import 'package:database_project/Model/TopChart.dart';
+import 'package:database_project/Model/TopChart/TopChart.dart';
 import 'package:database_project/Service/MusicService.dart';
 import 'package:database_project/View/RankingElementWidget.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +38,7 @@ class MusicChart extends StatelessWidget {
                   );
                 }
                 else{
-                  List<MusicExtend> musics = snapshot.data!.response!;
+                  List<MusicExtend> musics = snapshot.data!.response!.getMusicList();
                   return Builder(
                       builder: (context) {
                         List<Widget> musicList = [];

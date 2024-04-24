@@ -1,6 +1,9 @@
 import 'package:database_project/Controller/PlaylistLibraryController.dart';
 import 'package:database_project/Controller/PlaylistPreviewController.dart';
+import 'package:database_project/Model/MusicExtend.dart';
 import 'package:database_project/Model/Playlist/Playlist.dart';
+import 'package:database_project/Model/Playlist/PlaylistExtend.dart';
+import 'package:database_project/Service/PlaylistService.dart';
 import 'package:database_project/Style/ShadowPalette.dart';
 import 'package:database_project/View/PlayListPage/PlayListPage.dart';
 import 'package:flutter/material.dart';
@@ -20,14 +23,14 @@ class PlaylistLibraryItemWidget extends StatefulWidget {
     super.key,
     required this.currentIndex,
     required this.index,
-    required this.playlist,
+    required this.playlistExtend,
     required this.pageController,
     required this.imageUrl
   });
 
   final int currentIndex;
   final int index;
-  final Playlist playlist;
+  final PlaylistExtend playlistExtend;
   final PageController pageController;
   final String imageUrl;
 
@@ -39,7 +42,10 @@ class _PlaylistLibraryItemWidgetState extends State<PlaylistLibraryItemWidget> {
 
   @override
   void initState() {
-    var controller = Get.put(PlaylistPreviewController(playlist: widget.playlist), tag: widget.playlist.id.toString());
+    var controller = Get.put(PlaylistPreviewController(
+        playlist: widget.playlistExtend.playlist),
+        tag: widget.playlistExtend.playlist.id.toString()
+    );
     controller.fetchData();
     super.initState();
   }
@@ -54,7 +60,7 @@ class _PlaylistLibraryItemWidgetState extends State<PlaylistLibraryItemWidget> {
         duration: const Duration(milliseconds: 350),
         child: InkWell(
           onTap: (){
-            Get.to(PlayListPage(playlist: widget.playlist,));
+            Get.to(PlayListPage(playlistExtend: widget.playlistExtend));
           },
           child: Container(
             child: Column(
@@ -83,7 +89,7 @@ class _PlaylistLibraryItemWidgetState extends State<PlaylistLibraryItemWidget> {
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(20.w, 0, 0, 20.w),
                             child: Text(
-                              widget.playlist.name,
+                              widget.playlistExtend.playlist.name,
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 30.sp,
@@ -131,7 +137,7 @@ class _PlaylistLibraryItemWidgetState extends State<PlaylistLibraryItemWidget> {
                                   PopupMenuItem(
                                     value: value,
                                     onTap: () async {
-                                      String result = await Get.find<PlaylistLibraryController>().deletePlaylist(widget.playlist);
+                                      String result = await Get.find<PlaylistService>().deletePlaylist(widget.playlistExtend.playlist);
                                       final snackBar = SnackBar(
                                         content: Text(result),
                                       );
@@ -165,17 +171,18 @@ class _PlaylistLibraryItemWidgetState extends State<PlaylistLibraryItemWidget> {
                 ),
                 SizedBox(height: 50.h,),
                 Expanded(
-                  child: GetX<PlaylistPreviewController>(
-                    tag: widget.playlist.id.toString(),
-                    builder: (controller) {
+                  child: GetX<PlaylistService>(
+                    builder: (service) {
                       List<Widget> preview = [];
+                      List<MusicExtend> musicExtends = service.playlistMap[widget.playlistExtend.playlist.id]?.musics ?? [];
 
-                      if(controller.playlistExtend.value != null){
-                        for (var music in controller.playlistExtend.value!.musics) {
-                          preview.add(MusicElementWidget(
-                            musicExtend: music,
-                          ));
-                        }
+                      for(int i = 0; i<musicExtends.length && i <  3; i++ ){
+                        preview.add(MusicElementWidget(
+                          musicExtend: musicExtends[i],
+                        ));
+                      }
+                      for (var music in musicExtends) {
+
                       }
 
                       preview.add(const Expanded(child: SizedBox()));

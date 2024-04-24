@@ -1,6 +1,5 @@
 import 'package:database_project/Common/DubleTapExitWidget.dart';
-import 'package:database_project/Controller/CurrentPlaylistController.dart';
-import 'package:database_project/Controller/PlayerController.dart';
+import 'package:database_project/Model/MusicExtend.dart';
 import 'package:database_project/Service/CurrentPlaylistService.dart';
 import 'package:database_project/View/BottomNavBar/BottomNavBar.dart';
 import 'package:database_project/View/MusicElementWidget.dart';
@@ -51,11 +50,12 @@ class _CurrentPlaylistPageState extends State<CurrentPlaylistPage> {
                         ),
                         child: Obx((){
                           var service = Get.find<CurrentPlaylistService>();
+                          List<MusicExtend>? musicDtoList = service.playlist.value?.getMusicDtoList();
                           return ListView.builder(
-                              itemCount:  service.playlist.value == null ? 0 : service.playlist.value!.musics.length,
+                              itemCount: musicDtoList?.length ?? 0,
                               itemBuilder: (context , index){
                                 return MusicElementWidget(
-                                  musicExtend: service.playlist.value!.musics[index],
+                                  musicExtend:  musicDtoList![index],
                                   isInCurrentPlaylist: true,
                                 );
                               }

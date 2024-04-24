@@ -1,4 +1,4 @@
-import 'package:database_project/Common/MusicApiResponse.dart';
+import 'package:database_project/Service/ApiService/ApiResponse.dart';
 import 'package:database_project/Model/Album.dart';
 import 'package:database_project/Model/AlbumExtend.dart';
 import 'package:database_project/Model/Artist.dart';
@@ -33,7 +33,7 @@ class ArtistPage extends StatelessWidget {
                 );
               }
               else{
-                MusicApiResponse<ArtistExtend> apiResponse = snapshot.data!;
+                ApiResponse<ArtistExtend> apiResponse = snapshot.data!;
                 if(!apiResponse.isSuccess){
                   return Center(
                     child: Text("데이터를 가져 올 수 없습니다."),

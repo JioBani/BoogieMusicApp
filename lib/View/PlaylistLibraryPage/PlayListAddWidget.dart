@@ -1,7 +1,9 @@
 import 'package:database_project/Common/ImageUrls.dart';
 import 'package:database_project/Controller/PlaylistLibraryController.dart';
+import 'package:database_project/Service/PlaylistService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class PlayListAddWidget extends StatelessWidget {
@@ -93,12 +95,9 @@ class PlayListAddWidget extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 Navigator.of(context).pop(); // 다이얼로그 닫기
-                String result = await Get.find<PlaylistLibraryController>().addPlaylist(textController.text);
+                String result = await Get.find<PlaylistService>().addPlaylist(textController.text);
 
-                final snackBar = SnackBar(
-                  content: Text(result),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                Fluttertoast.showToast(msg: result);
                 if(result == "추가 성공"){
                   pageController.animateToPage(
                       index,

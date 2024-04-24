@@ -1,4 +1,4 @@
-import 'package:database_project/Common/MusicApiResponse.dart';
+import 'package:database_project/Service/ApiService/ApiResponse.dart';
 import 'package:database_project/Model/SearchResult.dart';
 import 'package:database_project/Service/MusicService.dart';
 import 'package:database_project/View/BottomNavBar/BottomNavBar.dart';
@@ -84,7 +84,7 @@ class _SearchResultPageState extends State<SearchResultPage> with TickerProvider
             FutureBuilder(
               future: MusicService.search(widget.searchString),
               builder: (context , snapshot) {
-                MusicApiResponse<SearchResult> response = snapshot.data!;
+                ApiResponse<SearchResult> response = snapshot.data!;
 
                 if(!response.isSuccess){
                   return Center(

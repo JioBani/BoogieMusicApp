@@ -1,6 +1,7 @@
 import 'package:database_project/Controller/PlayerController.dart';
 import 'package:database_project/Service/CurrentPlaylistService.dart';
 import 'package:database_project/Service/PlayerService.dart';
+import 'package:database_project/Service/PlaylistService.dart';
 import 'package:database_project/View/HomePage/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,8 +12,8 @@ void main() {
   runApp(const MyApp());
 
   Get.put(PlayerService() , permanent: true);
-  var currentPlaylistService = Get.put(CurrentPlaylistService());
-  currentPlaylistService.fetchData();
+  Get.put(CurrentPlaylistService() , permanent: true);
+  Get.put(PlaylistService() , permanent: true);
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 }
