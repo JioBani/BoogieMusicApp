@@ -9,6 +9,7 @@ import 'package:database_project/Service/LoginService.dart';
 import 'package:database_project/Service/MusicService.dart';
 import 'package:database_project/View/AlbumPage/AlbumPage.dart';
 import 'package:database_project/View/CurrentPlayListPage/CurrentPlaylistPage.dart';
+import 'package:database_project/View/LoginNeededPage/LoginNeededWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -48,30 +49,6 @@ class TestPage extends StatelessWidget {
                 ),
                 TextButton(
                     onPressed: () async {
-                      ApiResponse<bool>? response = await LoginService.auth();
-                      if(response == null){
-                        StaticLogger.logger.i('로그인 되어있지 않음');
-                      }
-                      else{
-                        if(response.isSuccess){
-                          StaticLogger.logger.i('로그인 완료');
-                        }
-                        else{
-                          StaticLogger.logger.e('로그인 실패 : ${response.exception!}');
-                        }
-                      }
-                    },
-                    child: Text(
-                      "로그인 체크",
-                      style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
-                          color : Colors.black
-                      ),
-                    )
-                ),
-                TextButton(
-                    onPressed: () async {
                       LoginService.logout();
                     },
                     child: Text(
@@ -86,6 +63,21 @@ class TestPage extends StatelessWidget {
                 TextButton(
                     onPressed: () async {
                       await LoginService.refreshAccessToken();
+                    },
+                    child: Text(
+                      "Refresh",
+                      style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w700,
+                          color : Colors.black
+                      ),
+                    )
+                ),
+                TextButton(
+                    onPressed: () async {
+                      Get.to(Scaffold(
+                        body: LoginNeededWidget(),
+                      ));
                     },
                     child: Text(
                       "Refresh",

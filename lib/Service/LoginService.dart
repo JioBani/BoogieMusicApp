@@ -7,6 +7,9 @@ import 'package:http/http.dart' as http;
 
 import 'ApiService/Exception.dart';
 
+
+//TODO getxservice로 변경
+
 class LoginService{
   static String getLink(String path){
     return "http://10.0.2.2:3000/$path";
@@ -18,6 +21,8 @@ class LoginService{
   static String? password;
   static final  List<Function> _onLogin = [];
   static final List<Function> _onLogout = [];
+  static bool _loggedIn = false;
+  static bool get loggedIn => _loggedIn;
 
   static Future<ApiResponse<bool>> login(String _userId, String _password) async {
     return await ApiResponse.handleRequest(
@@ -36,11 +41,15 @@ class LoginService{
           refreshToken = token.refreshToken;
           userId = _userId;
           password = _password;
+
+          _setLogin();
+
           for (var action in _onLogin) {
             action();
           }
           return true;
-        }
+        },
+        onError: (e) => _setLogout()
     );
   }
 
@@ -49,6 +58,8 @@ class LoginService{
     password = null;
     accessToken = null;
 
+    _setLogout();
+
     for (var action in _onLogout) {
       action();
     }
@@ -56,26 +67,29 @@ class LoginService{
     StaticLogger.logger.i("로그아웃 완료");
   }
 
-  static Future<ApiResponse<bool>?> auth() async {
-    if(accessToken == null){
-      return null;
-    }
-    else{
-      return await ApiResponse.handleRequest(
-          request: http.get(
-              Uri.parse(getLink("auth/authenticate")),
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization" : "Bearer ${accessToken!}"
-              },
-          ).timeout(const Duration(seconds: 5)),
-
-          action: (response){
-            return true;
-          }
-      );
-    }
-  }
+  // static Future<ApiResponse<bool>?> auth() async {
+  //   if(accessToken == null){
+  //     _setLogout();
+  //     return null;
+  //   }
+  //   else{
+  //     return await ApiResponse.handleRequest(
+  //         request: http.get(
+  //             Uri.parse(getLink("auth/authenticate")),
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //               "Authorization" : "Bearer ${accessToken!}"
+  //             },
+  //         ).timeout(const Duration(seconds: 5)),
+  //
+  //         action: (response){
+  //           _loggedIn = true;
+  //           return true;
+  //         },
+  //         onError: (e)=>_loggedIn = false
+  //     );
+  //   }
+  // }
 
   static Future<ApiResponse<bool>> refreshAccessToken() async {
     if(refreshToken == null){
@@ -121,10 +135,16 @@ class LoginService{
       ApiResponse<bool> refreshTokenRes = await LoginService.refreshAccessToken();
       if(!refreshTokenRes.isSuccess){
         StaticLogger.logger.i("[LoginService.tokenPipeline()] 2");
+
+        _setLogout();
+
         return ApiResponse.fromException(refreshTokenRes.exception!);
       }
       else{
         StaticLogger.logger.i("[LoginService.tokenPipeline()] 3");
+
+        _setLogin();
+
         return await ApiResponse.handleRequest<T>(
             request: request(),
             action: action
@@ -145,5 +165,14 @@ class LoginService{
   static void addOnLogoutListener(Function action){
     _onLogout.add(action);
   }
+  static void _setLogin(){
+    _loggedIn = true;
+  }
+
+  static void _setLogout(){
+    _loggedIn = false;
+  }
+
+
 
 }

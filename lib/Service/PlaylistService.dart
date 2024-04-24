@@ -1,3 +1,4 @@
+import 'package:database_project/Common/StaticLogger.dart';
 import 'package:database_project/Model/Music.dart';
 import 'package:database_project/Model/MusicExtend.dart';
 import 'package:database_project/Model/Playlist/CreatePlaylistDto.dart';
@@ -15,7 +16,7 @@ import 'MusicService.dart';
 class PlaylistService extends GetxService{
   final RxMap<int,PlaylistExtend> playlistMap = RxMap();
 
-  LoadingState loadingState = LoadingState.beforeLoading;
+  Rx<LoadingState> loadingState = Rx(LoadingState.beforeLoading);
 
   @override
   void onInit() {
@@ -25,20 +26,22 @@ class PlaylistService extends GetxService{
   }
 
   Future<void> fetchData() async {
-    loadingState = LoadingState.loading;
+    loadingState.value = LoadingState.loading;
     ApiResponse<List<PlaylistExtend>> response =  await MusicService.getPlaylistExtendsByUser();
 
     if(response.isSuccess){
-      loadingState = LoadingState.success;
+      loadingState.value = LoadingState.success;
 
       for (var element in response.response!) {
         playlistMap[element.playlist.id] = element;
       }
 
+      StaticLogger.logger.i("플레이리스트 불러오기 성공");
     }
     else{
-      loadingState = LoadingState.fail;
+      loadingState.value = LoadingState.fail;
       playlistMap.clear();
+      StaticLogger.logger.e("플레이리스트 불러오기 실패");
     }
   }
 

@@ -1,11 +1,18 @@
 import 'package:database_project/Common/DubleTapExitWidget.dart';
+import 'package:database_project/Common/LoadingDialog.dart';
+import 'package:database_project/Service/LoginService.dart';
 import 'package:database_project/Style/ShadowPalette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  LoginPage({super.key});
+
+
+  final TextEditingController idController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +35,7 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 150.h,),
+            SizedBox(height: 90.h,),
             Padding(
               padding: EdgeInsets.fromLTRB(30.w, 0 , 0, 0),
               child: Align(
@@ -42,44 +49,43 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 30.h,),
-            CustomInputFieldWidget(content: "아이디",),
-            SizedBox(height: 20.h,),
-            CustomInputFieldWidget(content: "비밀번호",),
-            SizedBox(height: 20.h,),
+            SizedBox(height: 40.h,),
             Padding(
               padding: EdgeInsets.fromLTRB(30.w, 0 , 0, 0),
-              child: Row(
-                children: [
-                  Text(
-                    "아이디가 없으신가요?",
-                    style: TextStyle(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "로그인 해서 부기뮤직의 다양한 \n서비스를 이용해 보세요.",
+                  style: TextStyle(
                       fontSize: 15.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.grey
-                    ),
+                      fontWeight: FontWeight.w700
                   ),
-                  SizedBox(width: 10.w,),
-                  TextButton(
-                    onPressed: (){},
-                    child: Text(
-                      "회원가입",
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black
-                      ),
-                    )
-                  )
-                ],
+                ),
               ),
             ),
+            SizedBox(height: 30.h,),
+            CustomInputFieldWidget(content: "아이디", controller: idController,),
+            SizedBox(height: 20.h,),
+            CustomInputFieldWidget(content: "비밀번호", controller: passwordController, isPassword: true,),
             SizedBox(height: 20.h,),
             Padding(
               padding:EdgeInsets.only(left: 20.w , right: 20.w),
               child: InkWell(
-                onTap: (){
+                onTap: () async {
+                  final (result , isClosed) = await LoadingDialog.showLoadingDialogWithFuture(
+                      context,
+                      LoginService.login(idController.text, passwordController.text)
+                  );
 
+                  if(!result.isSuccess){
+                    Fluttertoast.showToast(msg: "로그인에 실패했습니다. : ${result.exception}");
+                  }
+                  else{
+                    Fluttertoast.showToast(msg: "로그인에 성공했습니다.");
+                    if(context.mounted){
+                      Get.back();
+                    }
+                  }
                 },
                 child: Container(
                   width: double.infinity,
@@ -104,17 +110,52 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 10.h,),
+            Padding(
+              padding: EdgeInsets.fromLTRB(30.w, 0 , 0, 0),
+              child: Row(
+                children: [
+                  Text(
+                    "아이디가 없으신가요?",
+                    style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.grey
+                    ),
+                  ),
+                  SizedBox(width: 10.w,),
+                  TextButton(
+                      onPressed: (){},
+                      child: Text(
+                        "회원가입",
+                        style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black
+                        ),
+                      )
+                  )
+                ],
+              ),
+            ),
           ],
-        ),
+        )
       ),
     );
   }
 }
 
 class CustomInputFieldWidget extends StatelessWidget {
-  const CustomInputFieldWidget({super.key, required this.content});
+  const CustomInputFieldWidget({
+    super.key,
+    required this.content,
+    required this.controller,
+    this.isPassword = false
+  });
 
   final String content;
+  final TextEditingController controller;
+  final bool isPassword;
 
   @override
   Widget build(BuildContext context) {
@@ -123,15 +164,17 @@ class CustomInputFieldWidget extends StatelessWidget {
         Padding(
           padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 0),
           child: TextField(
+            controller: controller,
+            obscureText: isPassword,
             decoration: InputDecoration(
-              filled: true,
-              fillColor:  Colors.black12,
-              hintText: content,
-              contentPadding: EdgeInsets.symmetric(vertical: 20.h , horizontal: 10.w),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.r),
-                borderSide: BorderSide.none, // border 없애기
-              )
+                filled: true,
+                fillColor:  Colors.black12,
+                hintText: content,
+                contentPadding: EdgeInsets.symmetric(vertical: 20.h , horizontal: 10.w),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                  borderSide: BorderSide.none, // border 없애기
+                )
             ),
           ),
         ),

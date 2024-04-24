@@ -19,6 +19,7 @@ class ApiResponse<T> {
   static Future<ApiResponse<T2>> handleRequest<T2>({
     required Future<http.Response> request,
     required T2 Function(http.Response) action,
+    void Function(Object)? onError,
     Duration timeout = const Duration(seconds: 10)
   }) async {
     try {
@@ -35,6 +36,9 @@ class ApiResponse<T> {
       }
     } catch (e , stacktrace) {
       StaticLogger.logger.e('[ApiResponse.handleExceptions()] $e\n$stacktrace');
+      if(onError != null){
+        onError(e);
+      }
       return ApiResponse(
           isSuccess: false,
           exception : e,
