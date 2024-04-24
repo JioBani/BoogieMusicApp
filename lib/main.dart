@@ -1,5 +1,6 @@
 import 'package:database_project/Controller/PlayerController.dart';
 import 'package:database_project/Service/CurrentPlaylistService.dart';
+import 'package:database_project/Service/LoginService.dart';
 import 'package:database_project/Service/PlayerService.dart';
 import 'package:database_project/Service/PlaylistService.dart';
 import 'package:database_project/View/HomePage/HomePage.dart';
@@ -9,8 +10,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 void main() {
+
   runApp(const MyApp());
 
+  Get.put(LoginService());
   Get.put(PlayerService() , permanent: true);
   Get.put(CurrentPlaylistService() , permanent: true);
   Get.put(PlaylistService() , permanent: true);

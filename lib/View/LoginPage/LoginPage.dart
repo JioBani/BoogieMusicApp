@@ -74,7 +74,7 @@ class LoginPage extends StatelessWidget {
                 onTap: () async {
                   final (result , isClosed) = await LoadingDialog.showLoadingDialogWithFuture(
                       context,
-                      LoginService.login(idController.text, passwordController.text)
+                      LoginService.instance.login(idController.text, passwordController.text)
                   );
 
                   if(!result.isSuccess){

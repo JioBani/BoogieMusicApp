@@ -9,10 +9,12 @@ import 'package:get/get.dart';
 class CurrentPlaylistService extends GetxService{
   final Rx<CurrentPlaylistDto?> playlist = Rx(null);
   final RxList<MusicExtend> musics = RxList([]);
+  late final LoginService loginService;
 
   @override void onInit() {
-    LoginService.addOnLoginListener(fetchData);
-    LoginService.addOnLogoutListener(resetData);
+    loginService = Get.find<LoginService>();
+    loginService.addOnLoginListener(fetchData);
+    loginService.addOnLogoutListener(resetData);
     super.onInit();
   }
 

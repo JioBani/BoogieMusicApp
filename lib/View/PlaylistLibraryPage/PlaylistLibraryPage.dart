@@ -35,10 +35,10 @@ class _PlayListLibraryPageState extends State<PlayListLibraryPage> {
       body: SafeArea(
         child: Builder(
           builder: (context) {
-            return Builder(
-              builder: (context) {
-                if(!LoginService.loggedIn){
-                  return LoginNeededWidget();
+            return GetX<LoginService>(
+              builder: (service) {
+                if(!service.loggedIn){
+                  return const LoginNeededWidget();
                 }
                 return Stack(
                   children: [

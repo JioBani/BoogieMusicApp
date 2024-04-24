@@ -30,7 +30,7 @@ class TestPage extends StatelessWidget {
               children: [
                 TextButton(
                     onPressed: () async {
-                      ApiResponse<bool> response = await LoginService.login('admin2', 'admin2');
+                      ApiResponse<bool> response = await LoginService.instance.login('admin2', 'admin2');
                       if(response.isSuccess){
                         StaticLogger.logger.i('로그인 완료');
                       }
@@ -49,7 +49,7 @@ class TestPage extends StatelessWidget {
                 ),
                 TextButton(
                     onPressed: () async {
-                      LoginService.logout();
+                      LoginService.instance.logout();
                     },
                     child: Text(
                       "로그아웃",
@@ -62,7 +62,7 @@ class TestPage extends StatelessWidget {
                 ),
                 TextButton(
                     onPressed: () async {
-                      await LoginService.refreshAccessToken();
+                      await LoginService.instance.refreshAccessToken();
                     },
                     child: Text(
                       "Refresh",

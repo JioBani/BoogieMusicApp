@@ -33,7 +33,7 @@ class MusicService{
             getLink("playlists/user")),
           headers: {
             "Content-Type": "application/json",
-            "Authorization" : "Bearer ${LoginService.accessToken!}"
+            "Authorization" : "Bearer ${LoginService.instance.accessToken!}"
           },
         ),
         action: (response){
@@ -50,7 +50,7 @@ class MusicService{
             getLink("playlists/extend/$playlistId")),
           headers: {
             "Content-Type": "application/json",
-            "Authorization" : "Bearer ${LoginService.accessToken!}"
+            "Authorization" : "Bearer ${LoginService.instance.accessToken}"
           },
         ),
         action: (response)=> PlaylistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)))
@@ -64,7 +64,7 @@ class MusicService{
             getLink("playlists/extend")),
           headers: {
             "Content-Type": "application/json",
-            "Authorization" : "Bearer ${LoginService.accessToken!}"
+            "Authorization" : "Bearer ${LoginService.instance.accessToken}"
           },
         ),
         action: (response) => (jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>).map((e) =>
@@ -80,7 +80,7 @@ class MusicService{
             Uri.parse(getLink("playlists")),
             headers: {
               "Content-Type": "application/json",
-              "Authorization" : "Bearer ${LoginService.accessToken}"
+              "Authorization" : "Bearer ${LoginService.instance.accessToken}"
             },
             body: createPlaylistDto.toJson()
         ),
@@ -96,7 +96,7 @@ class MusicService{
                 Uri.parse(getLink("playlists/$playlistId")),
                 headers: {
                   "Content-Type": "application/json",
-                  "Authorization": "Bearer ${LoginService.accessToken!}"
+                  "Authorization": "Bearer ${LoginService.instance.accessToken}"
                 },
                 body: createPlaylistDto.toJson()
             ),
@@ -111,7 +111,7 @@ class MusicService{
           Uri.parse(getLink("playlists/$playlistId")),
           headers: {
             "Content-Type": "application/json",
-            "Authorization" : "Bearer ${LoginService.accessToken!}"
+            "Authorization" : "Bearer ${LoginService.instance.accessToken}"
           },
         ),
         action: (response) => response.body
@@ -124,7 +124,7 @@ class MusicService{
             Uri.parse(getLink("playlist-songs")),
             headers: {
               "Content-Type": "application/json",
-              "Authorization" : "Bearer ${LoginService.accessToken!}"
+              "Authorization" : "Bearer ${LoginService.instance.accessToken}"
             },
             body: CreatePlaylistSongDto(playlistId: playlistId, musicId: musicId).toJson()
         ),
@@ -138,7 +138,7 @@ class MusicService{
             Uri.parse(getLink("playlist-songs")),
             headers: {
               "Content-Type": "application/json",
-              "Authorization" : "Bearer ${LoginService.accessToken!}"
+              "Authorization" : "Bearer ${LoginService.instance.accessToken}"
             },
             body: CreatePlaylistSongDto(playlistId: playlistId, musicId: musicId).toJson()
         ),
@@ -181,7 +181,7 @@ class MusicService{
           Uri.parse(getLink("now-plays/dto")),
           headers: {
             "Content-Type": "application/json",
-            "Authorization" : "Bearer ${LoginService.accessToken}"
+            "Authorization" : "Bearer ${LoginService.instance.accessToken}"
           },
         ),
         action: (response) => CurrentPlaylistDto.fromMap(jsonDecode(utf8.decode(response.bodyBytes)))
@@ -195,10 +195,10 @@ class MusicService{
           Uri.parse(getLink("now-plays")),
           headers: {
             "Content-Type": "application/json",
-            "Authorization" : "Bearer ${LoginService.accessToken}"
+            "Authorization" : "Bearer ${LoginService.instance.accessToken}"
           },
           body: CreateCurrentPlaylistDto(
-              userId: LoginService.userId ?? '',
+              userId: LoginService.instance.userId ?? '',
               musicId: musicId,
               playTime: DateTime.now().millisecondsSinceEpoch
           ).toCreateJson(),
@@ -213,7 +213,7 @@ class MusicService{
           Uri.parse(getLink("now-plays/$musicId")),
           headers: {
             "Content-Type": "application/json",
-            "Authorization" : "Bearer ${LoginService.accessToken!}"
+            "Authorization" : "Bearer ${LoginService.instance.accessToken}"
           },
         ),
         action: (response) => response.body
@@ -242,50 +242,5 @@ class MusicService{
           return ArtistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
         }
     );
-  }
-
-  //#. 리프레시 토큰 테스트 현재재생목록
-  static Future<ApiResponse<ArtistExtend>> testNowPlaylist() async{
-
-    ApiResponse<ArtistExtend> request = await ApiResponse.handleRequest(
-        request: http.get(
-          Uri.parse(getLink("now-plays/dto")),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization" : "Bearer ${LoginService.accessToken ?? ''}"
-          },
-        ).timeout(const Duration(seconds: 1)),
-        action: (response){
-          return ArtistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
-        }
-    );
-
-    if(request.isSuccess){
-      return request;
-    }
-    else{
-      StaticLogger.logger.e("[MusicService.testNowPlaylist()] 가져오기 실패");
-      if(request.exception.runtimeType != TokenExpireException){
-        return request;
-      }
-      else{
-        StaticLogger.logger.i("[MusicService.testNowPlaylist()] 엑세스 토큰 새로고침 시작");
-        ApiResponse refreshResponse = await LoginService.refreshAccessToken();
-        if(refreshResponse.isSuccess){
-          return ApiResponse.handleRequest(
-             request: http.get(
-               Uri.parse(getLink("now-plays/dto")),
-             ).timeout(const Duration(seconds: 1)),
-             action: (response){
-               return ArtistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
-             }
-          );
-        }
-        else{
-          StaticLogger.logger.e("[MusicService.testNowPlaylist()] 엑세스 토큰 새로고침 실패");
-         return ApiResponse<ArtistExtend>.fromException(refreshResponse.exception!);
-        }
-      }
-    }
   }
 }

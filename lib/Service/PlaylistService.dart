@@ -20,8 +20,8 @@ class PlaylistService extends GetxService{
 
   @override
   void onInit() {
-    LoginService.addOnLoginListener(fetchData);
-    LoginService.addOnLogoutListener(resetData);
+    LoginService.instance.addOnLoginListener(fetchData);
+    LoginService.instance.addOnLogoutListener(resetData);
     super.onInit();
   }
 
