@@ -87,6 +87,23 @@ class _BottomNavBarState extends State<BottomNavBar> {
               ),
             ),
           ),
+          IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: (){
+              Get.offAll(
+                  MyPage(),
+                  transition: Transition.cupertino
+              );
+            },
+            icon: Center(
+              child: SvgPicture.asset(
+                "assets/images/profile.svg",
+                width: 35.sp,
+                height: 35.sp,
+                color: Colors.black,
+              ),
+            ),
+          ),
         ],
       ),
     );

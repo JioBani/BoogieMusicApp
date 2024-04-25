@@ -40,6 +40,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                     MyPage(),
                     transition: Transition.noTransition,
                   );
+                  case 3 : Get.off(
+                    MyPage(),
+                    transition: Transition.noTransition,
+                  );
                 }
               },
               type: BottomNavigationBarType.fixed,
@@ -51,6 +55,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.search, size: 25.w),
                   label: '플레이리스트',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.notifications, size: 25.w),
+                  label: '마이페이지',
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.notifications, size: 25.w),

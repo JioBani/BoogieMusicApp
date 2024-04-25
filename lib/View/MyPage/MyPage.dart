@@ -1,12 +1,12 @@
 import 'package:database_project/Common/DubleTapExitWidget.dart';
-import 'package:database_project/Test/TestPage.dart';
+import 'package:database_project/Model/User.dart';
+import 'package:database_project/Service/LoginService.dart';
 import 'package:database_project/View/BottomNavBar/BottomNavBar.dart';
-import 'package:database_project/View/LoginPage/LoginPage.dart';
-import 'package:database_project/View/RegistrationPage/RegistrationPage.dart';
+import 'package:database_project/View/MyPage/LoginWidget.dart';
+import 'package:database_project/View/MyPage/ProfileWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class MyPage extends StatelessWidget {
   const MyPage({super.key});
@@ -17,91 +17,85 @@ class MyPage extends StatelessWidget {
       child: Scaffold(
         body: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DefaultTextStyle(
-                style: TextStyle(
+                style: const TextStyle(
                 ),
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.black,
-                  padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
-                  child: DefaultTextStyle(
-                    style:  TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 50.h,),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              "로그인하세요",
-                              style: TextStyle(
-                                fontSize: 28.sp,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: (){
-                                Get.to(LoginPage());
-                              },
-                              icon: Icon(
-                                Icons.keyboard_arrow_right,
-                                size : 30.sp,
-                                color: Colors.white,
-                              )
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 50.h,),
-                        Text(
-                          "로그인 해서 뮤직 플레이어의\n서비스를 이용해보세요.",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        SizedBox(height: 50,),
-                        TextButton(
-                          onPressed: (){
-                            Get.to(RegistrationPage());
-                          },
-                          child: Text(
-                            "회원가입하기",
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w700,
-                              color : Colors.white
-                            ),
-                          )
-                        )
-                      ],
-                    ),
+                child: DefaultTextStyle(
+                  style:  TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white
+                  ),
+                  child: GetX<LoginService>(
+                    builder: (service) {
+                      if(service.loggedIn){
+                        return ProfileWidget(user: User(id: 'user-id', name: 'name', role: 'role'));
+                      }
+                      else{
+                        return const LoginWidget();
+                      }
+                    }
                   ),
                 ),
               ),
-              TextButton(
-                  onPressed: (){
-                    Get.to(TestPage());
-                  },
-                  child: Text(
-                    "테스트 페이지",
-                    style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w700,
-                        color : Colors.black
-                    ),
-                  )
-              )
+              SizedBox(height: 20.h,),
+              const MenuButton(icon: Icons.settings,text: "환경설정",),
+              const MenuButton(icon: Icons.library_books_rounded,text: "공지사항",),
+              const MenuButton(icon: Icons.report,text: "문의하기",),
+              const MenuButton(icon: Icons.code,text: "오픈소스 라이선스",),
+
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavBar(),
+        bottomNavigationBar: const BottomNavBar(),
       ),
     );
   }
 }
+
+class MenuButton extends StatelessWidget {
+  const MenuButton({super.key, required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(left: 20.w),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: 20.w),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 28.sp,
+                  color: Colors.grey,
+                ),
+                SizedBox(width: 15.w,),
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color : Colors.black,
+                        height: 1
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
