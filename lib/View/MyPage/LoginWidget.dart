@@ -59,7 +59,7 @@ class LoginWidget extends StatelessWidget {
             const Expanded(child: SizedBox()),
             TextButton(
                 onPressed: (){
-                  Get.to(const RegistrationPage());
+                  Get.to(RegistrationPage());
                 },
                 child: Text(
                   "회원가입하기",

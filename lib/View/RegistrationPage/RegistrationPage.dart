@@ -1,13 +1,72 @@
-import 'package:database_project/Common/DubleTapExitWidget.dart';
+import 'package:database_project/Common/LoadingDialog.dart';
+import 'package:database_project/Common/StaticLogger.dart';
+import 'package:database_project/Model/User.dart';
+import 'package:database_project/Model/User/CreateUserDto.dart';
+import 'package:database_project/Service/LoginService.dart';
 import 'package:database_project/Style/ShadowPalette.dart';
+import 'package:database_project/View/Common/StyledInputFieldWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 class RegistrationPage extends StatelessWidget {
-  const RegistrationPage({super.key});
+  RegistrationPage({super.key});
 
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController idController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController passwordReController = TextEditingController();
+
+
+  Future<bool?> buildSuccessDialog(BuildContext context, String msg) {
+    return showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Theme(
+          data: Theme.of(context).copyWith(dialogBackgroundColor: Colors.white),
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            title: Center(
+              child: Text(
+                msg,
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18.sp
+                ),
+              ),
+            ),
+            actionsPadding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    backgroundColor: Colors.black
+                ),
+                child: Text(
+                  "확인",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+            actionsAlignment: MainAxisAlignment.center,
+          ),
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -43,13 +102,13 @@ class RegistrationPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 30.h,),
-            CustomInputFieldWidget(content: "이름",),
+            StyledInputFieldWidget(content: "아이디",controller: idController,),
             SizedBox(height: 20.h,),
-            CustomInputFieldWidget(content: "아이디",),
+            StyledInputFieldWidget(content: "이름",controller:nameController ,),
             SizedBox(height: 20.h,),
-            CustomInputFieldWidget(content: "비빌번호",),
+            StyledInputFieldWidget(content: "비빌번호",controller: passwordController,isPassword: true,),
             SizedBox(height: 20.h,),
-            CustomInputFieldWidget(content: "비밀번호 확인",),
+            StyledInputFieldWidget(content: "비밀번호 확인",controller: passwordReController, isPassword: true,),
             SizedBox(height: 20.h,),
             Padding(
               padding: EdgeInsets.fromLTRB(30.w, 0 , 0, 0),
@@ -82,8 +141,50 @@ class RegistrationPage extends StatelessWidget {
             Padding(
               padding:EdgeInsets.only(left: 20.w , right: 20.w),
               child: InkWell(
-                onTap: (){
+                onTap: () async {
+                  User user = User(
+                      id: idController.text,
+                      name: nameController.text,
+                      role: ""
+                  );
 
+                  CreateUserDto createUserDto = CreateUserDto(
+                      id: idController.text,
+                      name: nameController.text,
+                      password: passwordController.text
+                  );
+
+
+                  var (result , msg) = createUserDto.checkValidate();
+
+                  if(!result){
+                    Fluttertoast.showToast(msg: msg);
+                    return;
+                  }
+
+                  if(passwordController.text != passwordReController.text){
+                    Fluttertoast.showToast(msg: "비밀번호 확인이 다릅니다.");
+                    StaticLogger.logger.i("${passwordController.text} ,  ${passwordReController.text}");
+                    return;
+                  }
+
+                  final (signInRes , isClosed) = await LoadingDialog.showLoadingDialogWithFuture(
+                      context,
+                      LoginService.instance.signIn(createUserDto)
+                  );
+
+                  if(!signInRes.isSuccess){
+                    buildSuccessDialog(context, "${signInRes.exception}");
+                  }
+                  else{
+                    buildSuccessDialog(context, "회원가입에 성공했습니다.").then(
+                        (value) => {
+                          if(context.mounted){
+                            Navigator.of(context).pop()
+                          }
+                        }
+                    );
+                  }
                 },
                 child: Container(
                   width: double.infinity,
@@ -114,89 +215,3 @@ class RegistrationPage extends StatelessWidget {
     );
   }
 }
-
-class CustomInputFieldWidget extends StatelessWidget {
-  const CustomInputFieldWidget({super.key, required this.content});
-
-  final String content;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 0),
-          child: TextField(
-            decoration: InputDecoration(
-                filled: true,
-                fillColor:  Colors.black12,
-                hintText: content,
-                contentPadding: EdgeInsets.symmetric(vertical: 20.h , horizontal: 10.w),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.r),
-                  borderSide: BorderSide.none, // border 없애기
-                )
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class GenderSelectWidget extends StatefulWidget {
-  const GenderSelectWidget({super.key});
-
-  @override
-  State<GenderSelectWidget> createState() => _GenderSelectWidgetState();
-}
-
-class _GenderSelectWidgetState extends State<GenderSelectWidget> {
-  String? selectedGender;
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(left: 20.w),
-          child: Text(
-            "성별" ,
-            style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 20.sp
-            ),
-          ),
-        ),
-        genderRadioListTile('남자'),
-        genderRadioListTile('여자'),
-        genderRadioListTile('기타'),
-      ],
-    );
-  }
-
-  Widget genderRadioListTile(String value) {
-    return Expanded(
-      child: RadioListTile<String>(
-        title: Text(
-            value,
-          style: TextStyle(
-            fontSize: 12.sp
-          ),
-        ),
-        value: value,
-        groupValue: selectedGender,
-        onChanged: (String? newValue) {
-          setState(() {
-            selectedGender = newValue;
-          });
-        },
-      ),
-    );
-  }
-}
-
-

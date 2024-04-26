@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:database_project/Model/User.dart';
+import 'package:database_project/Model/User/CreateUserDto.dart';
 import 'package:get/get.dart';
 import 'package:database_project/Service/ApiService/ApiResponse.dart';
 import 'package:database_project/Common/StaticLogger.dart';
@@ -111,6 +113,22 @@ class LoginService extends GetxService {
 
     StaticLogger.logger.i("로그아웃 완료");
   }
+
+  Future<ApiResponse<String>> signIn(CreateUserDto createUserDto) async {
+    return await ApiResponse.handleRequest(
+        request: http.post(
+          Uri.parse(getLink("auth/sign-in")),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode(createUserDto.toMap())
+        ),
+        action: (response) {
+          return response.body;
+        }
+    );
+  }
+
 
   Future<ApiResponse<bool>> refreshAccessToken() async {
     if (refreshToken == null) {
