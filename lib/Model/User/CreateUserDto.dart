@@ -29,7 +29,7 @@ class CreateUserDto{
         return (false , "이름은 2자리 이상이어야 합니다.");
       }
 
-      if(!_isValidName(id)){
+      if(!_isValidName(name)){
         return (false , "이름에는 대소문자 영문 , 한글과 - 만 사용 할 수 있습니다.");
       }
 
