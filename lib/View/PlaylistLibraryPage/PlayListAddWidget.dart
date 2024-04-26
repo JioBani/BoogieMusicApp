@@ -1,4 +1,5 @@
 import 'package:database_project/Common/ImageUrls.dart';
+import 'package:database_project/Common/StaticLogger.dart';
 import 'package:database_project/Controller/PlaylistLibraryController.dart';
 import 'package:database_project/Service/PlaylistService.dart';
 import 'package:flutter/material.dart';
@@ -96,6 +97,7 @@ class PlayListAddWidget extends StatelessWidget {
               onPressed: () async {
                 Navigator.of(context).pop(); // 다이얼로그 닫기
                 String result = await Get.find<PlaylistService>().addPlaylist(textController.text);
+
 
                 Fluttertoast.showToast(msg: result);
                 if(result == "추가 성공"){

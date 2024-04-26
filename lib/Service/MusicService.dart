@@ -84,7 +84,9 @@ class MusicService{
             },
             body: createPlaylistDto.toJson()
         ),
-        action: (response) => Playlist.fromMap(jsonDecode(response.body))
+        action: (response){
+          return Playlist.fromMap(jsonDecode(response.body));
+        }
     );
   }
 

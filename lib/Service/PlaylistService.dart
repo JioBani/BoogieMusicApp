@@ -56,6 +56,7 @@ class PlaylistService extends GetxService{
 
     if(result.isSuccess){
       playlistMap[result.response!.id] = PlaylistExtend(playlist: result.response!, musics: []);
+      playlistMap.refresh();
       return "추가 성공";
     }
     else{
