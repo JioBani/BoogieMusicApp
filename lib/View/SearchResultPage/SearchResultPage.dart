@@ -4,6 +4,7 @@ import 'package:database_project/Service/MusicService.dart';
 import 'package:database_project/View/BottomNavBar/BottomNavBar.dart';
 import 'package:database_project/View/Player/PlayerView.dart';
 import 'package:database_project/View/SearchResultPage/SearchResultPageView.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -84,6 +85,10 @@ class _SearchResultPageState extends State<SearchResultPage> with TickerProvider
             FutureBuilder(
               future: MusicService.search(widget.searchString),
               builder: (context , snapshot) {
+                if(!snapshot.hasData){
+                  return CupertinoActivityIndicator();
+                }
+
                 ApiResponse<SearchResult> response = snapshot.data!;
 
                 if(!response.isSuccess){
