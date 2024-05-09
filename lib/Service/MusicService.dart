@@ -47,7 +47,7 @@ class MusicService{
   static Future<ApiResponse<PlaylistExtend>> getPlaylistExtend(int playlistId) async {
     return LoginService.tokenPipeline(
         request:() =>  http.get(Uri.parse(
-            getLink("playlists/extend/$playlistId")),
+            getLink("playlists/$playlistId")),
           headers: {
             "Content-Type": "application/json",
             "Authorization" : "Bearer ${LoginService.instance.accessToken}"
@@ -57,11 +57,11 @@ class MusicService{
     );
   }
 
-  //#. 유저 id로 플레이리스트 세부 항목 가져오기
+  //#. 유저로 플레이리스트 세부 항목 가져오기
   static Future<ApiResponse<List<PlaylistExtend>>> getPlaylistExtendsByUser() async {
     return LoginService.tokenPipeline(
         request:() =>  http.get(Uri.parse(
-            getLink("playlists/extend")),
+            getLink("playlists")),
           headers: {
             "Content-Type": "application/json",
             "Authorization" : "Bearer ${LoginService.instance.accessToken}"
@@ -155,7 +155,7 @@ class MusicService{
   static Future<ApiResponse<TopChartDto>> getTopChart() async {
     return ApiResponse.handleRequest(
         request: http.get(
-          Uri.parse(getLink("top-charts/dto")),
+          Uri.parse(getLink("top-charts")),
         ),
         action: (response){
           return TopChartDto.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
@@ -180,7 +180,7 @@ class MusicService{
   static Future<ApiResponse<CurrentPlaylistDto>> getCurrentPlaylistByUserId() async{
     return LoginService.tokenPipeline(
         request: () => http.get(
-          Uri.parse(getLink("now-plays/dto")),
+          Uri.parse(getLink("now-plays")),
           headers: {
             "Content-Type": "application/json",
             "Authorization" : "Bearer ${LoginService.instance.accessToken}"
@@ -226,7 +226,7 @@ class MusicService{
   static Future<ApiResponse<AlbumExtent>> getAlbumExtend(int albumId) async{
     return ApiResponse.handleRequest(
         request: http.get(
-          Uri.parse(getLink("albums/extend/$albumId")),
+          Uri.parse(getLink("albums/$albumId")),
         ).timeout(const Duration(seconds: 1)),
         action: (response){
           return AlbumExtent.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));
@@ -238,7 +238,7 @@ class MusicService{
   static Future<ApiResponse<ArtistExtend>> getArtistExtend(int artistId) async{
     return ApiResponse.handleRequest(
         request: http.get(
-          Uri.parse(getLink("artists/extend/$artistId")),
+          Uri.parse(getLink("artists/$artistId")),
         ).timeout(const Duration(seconds: 1)),
         action: (response){
           return ArtistExtend.fromMap(jsonDecode(utf8.decode(response.bodyBytes)));

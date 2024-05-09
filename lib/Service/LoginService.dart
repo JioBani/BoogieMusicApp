@@ -148,8 +148,12 @@ class LoginService extends GetxService {
             JwtToken token = JwtToken.fromMap(jsonDecode(response.body));
             accessToken = token.accessToken;
             refreshToken = token.refreshToken;
+            _setLogin();
             StaticLogger.logger.i("리프레쉬 성공 : ${refreshToken}");
             return true;
+          },
+          onError: (e){
+            _setLogout();
           }
       );
     }
